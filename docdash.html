@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Dashboard - Debra Robertson</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/GLTFLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/OrbitControls.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            color: #1d1d1f;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 320px 1fr 340px 320px;
+            gap: 0;
+            width: 100vw;
+            height: 100vh;
+            transition: grid-template-columns 0.3s ease;
+        }
+        
+        .dashboard.expanded-first {
+            grid-template-columns: 368px 1fr 289px 272px;
+        }
+        
+        .dashboard.expanded-second {
+            grid-template-columns: 272px 1.15fr 289px 272px;
+        }
+        
+        .dashboard.expanded-third {
+            grid-template-columns: 272px 1fr 391px 272px;
+        }
+        
+        .dashboard.expanded-fourth {
+            grid-template-columns: 272px 1fr 289px 368px;
+        }
+        
+        .panel {
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            padding: 24px;
+            overflow-y: auto;
+            position: relative;
+            min-height: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .panel:hover {
+            background: #fafbfc;
+        }
+        
+        .panel.expanded {
+            background: #f8fafc;
+            box-shadow: inset 0 0 0 2px #3b82f6;
+        }
+        
+        .panel:last-child {
+            border-right: none;
+        }
+        
+        .patient-info h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+            letter-spacing: -0.5px;
+        }
+        
+        .patient-details {
+            margin-bottom: 32px;
+            font-size: 13px;
+            color: #6e6e73;
+        }
+        
+        .patient-id {
+            font-size: 12px;
+            color: #86868b;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+        
+        .separator {
+            color: #d2d2d7;
+            font-weight: 300;
+            font-size: 12px;
+        }
+        
+        .patient-age {
+            font-size: 12px;
+            color: #007aff;
+            font-weight: 700;
+            margin-top: 0;
+            text-transform: none;
+        }
+        
+        .vital-signs {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .vital-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: transparent;
+            border: none;
+            padding: 0;
+            text-align: left;
+        }
+        
+        .vital-icon {
+            width: 24px;
+            height: 24px;
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+        
+        .vital-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .vital-number {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1;
+            letter-spacing: -0.3px;
+        }
+        
+        .vital-card.heart-rate .vital-number {
+            color: #ff3b30;
+        }
+        
+        .vital-card.brain-activity .vital-number {
+            color: #007aff;
+        }
+        
+        .vital-label {
+            font-size: 11px;
+            color: #6e6e73;
+            margin: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            line-height: 1;
+        }
+        
+        .mini-chart {
+            height: 40px;
+            width: 120px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .heartrate-loader {
+            --dasharray: 814;
+            position: relative;
+            width: 120px;
+            height: 40px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .heartrate-loader svg {
+            position: absolute;
+            width: 120px;
+            height: 40px;
+        }
+        
+        .heartrate-loader svg path {
+            stroke-dasharray: var(--dasharray);
+            animation: heartRate 5s infinite linear forwards;
+        }
+        
+        @keyframes heartRate {
+            from {
+                stroke-dashoffset: var(--dasharray);
+            }
+            to {
+                stroke-dashoffset: calc(var(--dasharray) * -1);
+            }
+        }
+        
+        .brain-chart {
+            height: 40px;
+            width: 120px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .brain-loader {
+            --dasharray: 400;
+            position: relative;
+            width: 120px;
+            height: 40px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .brain-loader svg {
+            position: absolute;
+            width: 120px;
+            height: 40px;
+        }
+        
+        .brain-loader svg path {
+            stroke-dasharray: var(--dasharray);
+            animation: brainActivity 4s infinite linear forwards;
+        }
+        
+        @keyframes brainActivity {
+            from {
+                stroke-dashoffset: var(--dasharray);
+            }
+            to {
+                stroke-dashoffset: calc(var(--dasharray) * -1);
+            }
+        }
+        
+        .medical-history h3 {
+            font-size: 13px;
+            margin-bottom: 24px;
+            color: #1d1d1f;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .history-list {
+            width: 100%;
+        }
+        
+        .history-item {
+            margin-bottom: 16px;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .history-item:hover {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 0 -12px 16px -12px;
+        }
+        
+        .history-item.expanded {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 0 -16px 20px -16px;
+        }
+        
+        .history-date {
+            font-size: 11px;
+            color: #86868b;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        
+        .history-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 15px;
+            color: #1d1d1f;
+            letter-spacing: -0.2px;
+        }
+        
+        .history-symptoms {
+            font-size: 12px;
+            color: #6e6e73;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .history-main {
+            flex: 1;
+        }
+        
+        .history-chevron {
+            color: #94a3b8;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .history-chevron svg {
+            width: 12px;
+            height: 12px;
+            transition: transform 0.3s ease;
+        }
+        
+        .history-item.expanded .history-chevron {
+            transform: rotate(180deg);
+        }
+        
+        .history-details {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            display: none;
+        }
+        
+        .history-item.expanded .history-details {
+            display: block;
+        }
+        
+        .history-description {
+            font-size: 14px;
+            color: #6e6e73;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+        
+        .history-image {
+            width: 60px;
+            height: 60px;
+            background-color: #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60"><rect width="60" height="60" fill="%23f1f5f9"/><path d="M20 25h20v10H20z" fill="%23cbd5e1"/><circle cx="25" cy="30" r="2" fill="%23ffffff"/><circle cx="35" cy="30" r="2" fill="%23ffffff"/></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .history-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 16px;
+            height: 40px;
+            width: 128px;
+            border: none;
+            background: #056bfa27;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .history-button .button-label {
+            margin-top: 1px;
+            font-size: 14px;
+            line-height: 22px;
+            color: #007aff;
+            letter-spacing: 0.3px;
+            font-weight: 700;
+        }
+        
+        .history-button .svg-icon {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.2s ease;
+        }
+        
+        .history-button:hover {
+            background: #056bfa49;
+        }
+        
+
+        
+        .history-button.secondary {
+            background: #22c55e27;
+        }
+        
+        .history-button.secondary .button-label {
+            color: #34c759;
+        }
+        
+        .history-button.secondary:hover {
+            background: #22c55e49;
+        }
+        
+        .add-entry {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #007aff;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 20px;
+            padding: 8px 0;
+            font-weight: 700;
+        }
+        
+        .add-entry:hover {
+            color: #1d4ed8;
+        }
+        
+        .body-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 20px;
+        }
+        
+        .body-figure {
+            width: 200px;
+            height: 350px;
+            position: relative;
+            margin: 20px 0 30px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        #threejs-container {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        
+        .body-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #ef4444, 0 4px 12px rgba(239, 68, 68, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .marker-1 {
+            top: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .marker-2 {
+            top: 160px;
+            left: 35%;
+            transform: translateX(-50%);
+        }
+        
+        .marker-3 {
+            top: 210px;
+            right: 25%;
+            transform: translateX(50%);
+        }
+        
+        .bottom-controls {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .control-icon {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: #64748b;
+            font-size: 16px;
+        }
+        
+        .control-icon:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            color: #475569;
+        }
+        
+        .control-icon.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .lab-results h3 {
+            font-size: 13px;
+            margin-bottom: 24px;
+            color: #1d1d1f;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .lab-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 4px -16px;
+            min-height: 44px;
+            position: relative;
+        }
+        
+        .lab-item:hover:not(.highlighted) {
+            background-color: transparent !important;
+            border: 2px dashed #ef4444 !important;
+            border-radius: 12px !important;
+            padding: 16px 20px !important;
+            margin: 2px -16px !important;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .lab-item:hover:not(.highlighted)::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ef4444"><circle cx="6" cy="8" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="12" cy="16" r="2"/><line x1="6" y1="8" x2="12" y2="16" stroke="%23ef4444" stroke-width="2"/><line x1="18" y1="8" x2="12" y2="16" stroke="%23ef4444" stroke-width="2"/><line x1="6" y1="8" x2="18" y2="8" stroke="%23ef4444" stroke-width="2"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        
+        .lab-item:hover:not(.highlighted) .lab-name {
+            color: #1e293b !important;
+            font-weight: 600 !important;
+            margin-left: 32px !important;
+        }
+        
+        .lab-item:hover:not(.highlighted) .lab-reference {
+            color: #64748b !important;
+        }
+        
+        .lab-item:hover:not(.highlighted) .lab-value {
+            color: #1e293b !important;
+        }
+        
+        .lab-item.highlighted {
+            background-color: #fef2f2;
+            border: 2px dashed #fca5a5;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 2px -16px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .lab-item.highlighted::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 24px;
+            height: 24px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ef4444"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>') no-repeat center;
+            background-size: contain;
+        }
+        
+        .lab-name {
+            font-size: 14px;
+            color: #1d1d1f;
+            font-weight: 600;
+            flex: 1;
+            margin-bottom: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .lab-item.highlighted .lab-name {
+            color: #1d1d1f;
+            font-weight: 700;
+            margin-left: 32px;
+        }
+        
+        .lab-value-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+        
+        .lab-value {
+            font-weight: 800;
+            color: #1d1d1f;
+            font-size: 17px;
+            margin-bottom: 0;
+            min-width: 40px;
+            text-align: right;
+            letter-spacing: -0.2px;
+        }
+        
+        .lab-value.high {
+            color: #ff3b30;
+            font-size: 17px;
+        }
+        
+        .lab-value.normal {
+            color: #1d1d1f;
+        }
+        
+        .lab-reference {
+            font-size: 11px;
+            color: #86868b;
+            white-space: nowrap;
+            min-width: 80px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .lab-item.highlighted .lab-reference {
+            color: #6b7280;
+        }
+        
+        .tasks-panel {
+            background: #f0f9ff;
+            color: #334155;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tasks-panel:hover {
+            background: #e0f2fe;
+        }
+        
+        .tasks-panel.expanded {
+            background: #dbeafe;
+            box-shadow: inset 0 0 0 2px #3b82f6;
+        }
+        
+        .tasks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .tasks-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #1d1d1f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .add-task {
+            background: #3b82f6;
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 0;
+        }
+        
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #cbd5e1;
+            border-radius: 4px;
+            margin-top: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .task-checkbox:hover {
+            border-color: #3b82f6;
+        }
+        
+        .task-checkbox.checked {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        .task-content {
+            flex: 1;
+        }
+        
+        .task-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #1d1d1f;
+            line-height: 1.3;
+            letter-spacing: -0.2px;
+        }
+        
+        .task-subtitle {
+            font-size: 12px;
+            color: #6e6e73;
+            font-weight: 600;
+        }
+        
+        .activity-section {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .activity-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #1d1d1f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .activity-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 0;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-sender {
+            font-weight: 700;
+            color: #1d1d1f;
+            font-size: 14px;
+            margin-bottom: 4px;
+            letter-spacing: -0.1px;
+        }
+        
+        .activity-text {
+            font-size: 13px;
+            line-height: 1.4;
+            color: #6e6e73;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        .activity-time {
+            font-size: 11px;
+            color: #86868b;
+            font-weight: 600;
+        }
+        
+        .chevron {
+            color: #ccc;
+            font-size: 12px;
+        }
+        
+        .expand-icon {
+            color: #666;
+            font-size: 12px;
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard" id="dashboard">
+        <!-- Patient Info Panel -->
+        <div class="panel patient-info" data-section="first">
+            <div class="patient-id">
+                <span>ID H6KR4378</span>
+                <span class="separator">|</span>
+                <span class="patient-age">Age 38</span>
+            </div>
+            <h2>Debra Robertson</h2>
+            
+            <div class="medical-history">
+                <h3>Medical history</h3>
+                
+                <div class="history-list">
+                    <div class="history-item" data-condition="bradycardia">
+                        <div class="history-header">
+                            <div class="history-main">
+                                <div class="history-date">2017-04-02</div>
+                                <div class="history-title">Bradycardia</div>
+                                <div class="history-symptoms">Fatigue | Dizziness | Confusion</div>
+                            </div>
+                            <div class="history-chevron">
+                                <svg fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-description">
+                                Bradycardia is a slower than normal heart rate. The hearts of adults at rest usually beat between 60 and 100 times a minute.
+                            </div>
+                            <div class="history-image"></div>
+                            <div class="history-actions">
+                                <button class="history-button primary">
+                                    <span class="button-label">View tests</span>
+                                </button>
+                                <button class="history-button secondary">
+                                    <span class="button-label">Treatment</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="history-item" data-condition="liver">
+                        <div class="history-header">
+                            <div class="history-main">
+                                <div class="history-date">2018-06-03</div>
+                                <div class="history-title">Liver Disease</div>
+                                <div class="history-symptoms">Skin and eyes that appear yellowish | Itchy skin</div>
+                            </div>
+                            <div class="history-chevron">
+                                <svg fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-description">
+                                Liver disease can be inherited or caused by various factors like viruses, alcohol use, and obesity. Signs include jaundice and abdominal pain.
+                            </div>
+                            <div class="history-image"></div>
+                            <div class="history-actions">
+                                <button class="history-button primary">
+                                    <span class="button-label">View tests</span>
+                                </button>
+                                <button class="history-button secondary">
+                                    <span class="button-label">Treatment</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="history-item" data-condition="kidney">
+                        <div class="history-header">
+                            <div class="history-main">
+                                <div class="history-date">2019-09-07</div>
+                                <div class="history-title">Kidney stones</div>
+                                <div class="history-symptoms">Fatigue | Shortness of breath | Chest pain</div>
+                            </div>
+                            <div class="history-chevron">
+                                <svg fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-description">
+                                Kidney stones are hard deposits of minerals and salts that form inside your kidneys. They can affect any part of your urinary tract.
+                            </div>
+                            <div class="history-image"></div>
+                            <div class="history-actions">
+                                <button class="history-button primary">
+                                    <span class="button-label">View tests</span>
+                                </button>
+                                <button class="history-button secondary">
+                                    <span class="button-label">Treatment</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="history-item" data-condition="heart">
+                        <div class="history-header">
+                            <div class="history-main">
+                                <div class="history-date">2020-11-07</div>
+                                <div class="history-title">Heart failure</div>
+                                <div class="history-symptoms">Fatigue | Irregular heartbeat | Swelling in your legs</div>
+                            </div>
+                            <div class="history-chevron">
+                                <svg fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-description">
+                                Heart failure occurs when the heart muscle doesn't pump blood as well as it should. It can develop suddenly or over time.
+                            </div>
+                            <div class="history-image"></div>
+                            <div class="history-actions">
+                                <button class="history-button primary">
+                                    <span class="button-label">View tests</span>
+                                </button>
+                                <button class="history-button secondary">
+                                    <span class="button-label">Treatment</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="history-item" data-condition="pulmonary">
+                        <div class="history-header">
+                            <div class="history-main">
+                                <div class="history-title">Pulmonary stenosis</div>
+                                <div class="history-symptoms">Fatigue | Chest pain | Loss of consciousness</div>
+                            </div>
+                            <div class="history-chevron">
+                                <svg fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-description">
+                                Pulmonary stenosis is a condition where the valve between the heart and lungs is narrowed, restricting blood flow.
+                            </div>
+                            <div class="history-image"></div>
+                            <div class="history-actions">
+                                <button class="history-button primary">
+                                    <span class="button-label">View tests</span>
+                                </button>
+                                <button class="history-button secondary">
+                                    <span class="button-label">Treatment</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="history-item" data-condition="coronary">
+                        <div class="history-header">
+                            <div class="history-main">
+                                <div class="history-title">Coronary artery disease</div>
+                                <div class="history-symptoms">Chest pain | Shortness of breath | Heart attack</div>
+                            </div>
+                            <div class="history-chevron">
+                                <svg fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-description">
+                                Coronary artery disease occurs when major blood vessels that supply the heart become damaged or diseased.
+                            </div>
+                            <div class="history-image"></div>
+                            <div class="history-actions">
+                                <button class="history-button primary">
+                                    <span class="button-label">View tests</span>
+                                </button>
+                                <button class="history-button secondary">
+                                    <span class="button-label">Treatment</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="history-item" data-condition="dilated">
+                        <div class="history-header">
+                            <div class="history-main">
+                                <div class="history-title">Dilated cardiomyopathy</div>
+                                <div class="history-symptoms">Fatigue | Shortness of breath | Swelling</div>
+                            </div>
+                            <div class="history-chevron">
+                                <svg fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-description">
+                                Dilated cardiomyopathy occurs when the heart's main pumping chamber is enlarged and weakened.
+                            </div>
+                            <div class="history-image"></div>
+                            <div class="history-actions">
+                                <button class="history-button primary">
+                                    <span class="button-label">View tests</span>
+                                </button>
+                                <button class="history-button secondary">
+                                    <span class="button-label">Treatment</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="history-item" data-condition="heart2">
+                        <div class="history-header">
+                            <div class="history-main">
+                                <div class="history-title">Heart failure</div>
+                                <div class="history-symptoms">Fatigue | Shortness of breath</div>
+                            </div>
+                            <div class="history-chevron">⌄</div>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-description">
+                                Ongoing heart failure management with focus on symptom control and quality of life improvement.
+                            </div>
+                            <div class="history-image"></div>
+                            <div class="history-actions">
+                                <button class="history-button primary">View tests</button>
+                                <button class="history-button secondary">Prescribed treatment</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-entry">
+                    <span>+</span>
+                    <span>Add new entry</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Body Diagram Panel -->
+        <div class="panel body-diagram" data-section="second">
+            <div class="vital-signs">
+                <div class="vital-card heart-rate">
+                    <div class="vital-info">
+                        <div class="vital-number">120 BPM</div>
+                        <div class="vital-label">Atrial Fibrillation</div>
+                    </div>
+                    <div class="mini-chart">
+                        <div class="heartrate-loader">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="30" viewBox="0 0 80 30">
+                                <path d="m0,18.72h6.46c1.03-0.4,1.68-2.84,2.82-2.86s1.92,2.59,3.05,2.86c1.46,0.34,4.31-1.68,5.79-1.43,0.66,0.11,1.36,1.42,2.03,1.43,0.51,0,1.05-1.07,1.56-1.06,0.47,0.02,0.9,0.91,1.33,1.06s1.4-0.17,1.8,0c0.35,0.15,0.5,1.18,0.86,1.06,0.47-0.17,0.41-11.86,1.17-11.86,1.01,0,1.79,15.84,2.42,15.84,0.56,0,-0.01-4.22,1.23-5.04,0.5-0.32,1.98,0.22,2.56,0c1.04-0.4,1.7-2.85,2.86-2.89,1.25-0.04,2.23,2.63,3.44,2.89,1.3,0.28,3.84-1.47,5.16-1.24,0.81,0.14,1.66,1.82,2.48,1.74,0.56-0.06,0.71-1.45,1.27-1.49,0.44-0.03,0.83,0.86,1.23,0.99s1.41-0.16,1.82,0s0.58,1.08,1.02,1.12c0.72,0.06,0.38-11.94,1.25-11.94,0.75,0,1.28,12.85,1.88,12.86,0.73,0.02,0.73-1.75,1.35-2.05s2.18,0.24,2.82,0c1.07-0.4,1.85-2.9,3.03-2.89,1.3,0.01,1.98,2.98,3.24,3.23,1.33,0.26,3.68-1.84,5.04-1.71,0.72,0.07,1.64,1.18,2.33,1.37h6.46" stroke-linejoin="round" stroke-width="1.5" fill="none" stroke="#ef4444"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="vital-card brain-activity">
+                    <div class="vital-info">
+                        <div class="vital-number">16</div>
+                        <div class="vital-label">Brain Activity</div>
+                    </div>
+                    <div class="mini-chart brain-chart">
+                        <div class="brain-loader">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="30" viewBox="0 0 80 30">
+                                <path d="m0,15h3.2c0.8-3.2,2.4-3.2,3.2,0s2.4,3.2,3.2,0,2.4-3.2,3.2,0,2.4,3.2,3.2,0,2.4-3.2,3.2,0,2.4,3.2,3.2,0,2.4-3.2,3.2,0,2.4,3.2,3.2,0,2.4-3.2,3.2,0,2.4,3.2,3.2,0,2.4-3.2,3.2,0,2.4,3.2,3.2,0,2.4-3.2,3.2,0,2.4,3.2,3.2,0,2.4-3.2,3.2,0,2.4,3.2,3.2,0,2.4-3.2,3.2,0,2.4,3.2,3.2,0,2.4-3.2,3.2,0,2.4,3.2,3.2,0h3.2" stroke-linejoin="round" stroke-width="1.5" fill="none" stroke="#3b82f6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lab Results Panel -->
+        <div class="panel lab-results" data-section="third">
+            <h3>Analysis codes</h3>
+            
+            <div class="lab-item">
+                <div class="lab-name">Glucose</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">93</div>
+                    <div class="lab-reference">65-99 mg/dL</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">BUN</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">7</div>
+                    <div class="lab-reference">6-20 mg/dL</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">BUN / Creatinine Ratio</div>
+                <div class="lab-value-container">
+                    <div class="lab-value high">23.5</div>
+                    <div class="lab-reference">9-23 mg/dl</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Creatinine</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">0.99</div>
+                    <div class="lab-reference">0.57-1.00 mg/dl</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">eGFR if nonafrican Am</div>
+                <div class="lab-value-container">
+                    <div class="lab-value high">1.77</div>
+                    <div class="lab-reference">>59 ml/min/1.73</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">eGFR if african Am</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">86</div>
+                    <div class="lab-reference">>59 ml/min/1.73</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Sodium</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">141</div>
+                    <div class="lab-reference">134-144 mmol/L</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Potassium</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">4.6</div>
+                    <div class="lab-reference">3.5-5.0 mEq/L</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Carbon Dioxide</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">22</div>
+                    <div class="lab-reference">22-29 mEq/L</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Calcium</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">8.8</div>
+                    <div class="lab-reference">8.5-10.1 mg/dL</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Protein, Total</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">7.4</div>
+                    <div class="lab-reference">6.0-8.3 g/dL</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Albumin</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">5.0</div>
+                    <div class="lab-reference">3.5-5.0 g/dL</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Globulin, Total</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">2.4</div>
+                    <div class="lab-reference">2.0-3.5 g/dL</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Chloride</div>
+                <div class="lab-value-container">
+                    <div class="lab-value high">107</div>
+                    <div class="lab-reference">96-106 mEq/L</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">A/G Ratio</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">2.1</div>
+                    <div class="lab-reference">1.0-2.5</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Bilirubin, Total</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">0.6</div>
+                    <div class="lab-reference">0.3-1.2 mg/dL</div>
+                </div>
+            </div>
+            
+            <div class="lab-item">
+                <div class="lab-name">Alkaline Phosphatase</div>
+                <div class="lab-value-container">
+                    <div class="lab-value normal">76</div>
+                    <div class="lab-reference">44-147 U/L</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tasks Panel -->
+        <div class="panel tasks-panel" data-section="fourth">
+            <div class="tasks-header">
+                <div class="tasks-title">Tests</div>
+                <button class="add-task">+</button>
+            </div>
+            
+            <div class="task-item">
+                <div class="task-checkbox">✓</div>
+                <div class="task-content">
+                    <div class="task-title">Do preliminary tests</div>
+                    <div class="task-subtitle">in 5 days</div>
+                </div>
+            </div>
+            
+            <div class="task-item">
+                <div class="task-checkbox"></div>
+                <div class="task-content">
+                    <div class="task-title">Approve the MRI negative</div>
+                    <div class="task-subtitle">in 3 days</div>
+                </div>
+            </div>
+            
+            <div class="task-item">
+                <div class="task-checkbox"></div>
+                <div class="task-content">
+                    <div class="task-title">Prescribe the medication</div>
+                    <div class="task-subtitle">Today</div>
+                </div>
+            </div>
+            
+            <div class="activity-section">
+                <div class="activity-header">
+                    <div class="activity-title">Last Tests</div>
+                    <button class="add-task">+</button>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-sender">Aubrey Mccoy</div>
+                    <div class="activity-text">sent you the results of your tests</div>
+                    <div class="activity-time">15 days ago</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-sender">Dr. Cisco-UCSF</div>
+                    <div class="activity-text">Healthcare Platform Discussion</div>
+                    <div class="activity-time">2 hours ago</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-sender">Britney Cooper</div>
+                    <div class="activity-text">sent you a new lab report</div>
+                    <div class="activity-time">1 day ago</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add expandable history functionality
+        document.querySelectorAll('.history-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Close all other expanded items
+                document.querySelectorAll('.history-item').forEach(otherItem => {
+                    if (otherItem !== this && otherItem.classList.contains('expanded')) {
+                        otherItem.classList.remove('expanded');
+                    }
+                });
+                
+                // Toggle this item
+                this.classList.toggle('expanded');
+            });
+        });
+        
+        // Lab results hover effects with glitch prevention
+        let hoverTimeout;
+        document.querySelectorAll('.lab-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                clearTimeout(hoverTimeout);
+                // Small delay to prevent rapid flickering
+                hoverTimeout = setTimeout(() => {
+                    this.classList.add('lab-hovered');
+                }, 50);
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                clearTimeout(hoverTimeout);
+                this.classList.remove('lab-hovered');
+            });
+        });
+        
+        // Section expansion functionality
+        const dashboard = document.getElementById('dashboard');
+        const panels = document.querySelectorAll('.panel');
+        
+        panels.forEach(panel => {
+            panel.addEventListener('mouseenter', function() {
+                const section = this.getAttribute('data-section');
+                
+                // Remove all expanded classes
+                dashboard.className = 'dashboard';
+                panels.forEach(p => p.classList.remove('expanded'));
+                
+                // Expand this section
+                dashboard.classList.add(`expanded-${section}`);
+                this.classList.add('expanded');
+            });
+            
+            panel.addEventListener('mouseleave', function() {
+                // Remove all expanded classes when mouse leaves
+                dashboard.className = 'dashboard';
+                panels.forEach(p => p.classList.remove('expanded'));
+            });
+        });
+        
+        document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent panel expansion
+                if (this.style.backgroundColor === 'white') {
+                    this.style.backgroundColor = 'rgba(255,255,255,0.3)';
+                    this.innerHTML = '✓';
+                } else {
+                    this.style.backgroundColor = 'white';
+                    this.innerHTML = '';
+                }
+            });
+        });
+
+        // Three.js 3D Model Setup
+        function init3DModel() {
+            const container = document.getElementById('threejs-container');
+            if (!container) return;
+
+            // Scene setup
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf8fafc);
+
+            // Camera setup
+            const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 2.5);
+
+            // Renderer setup
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // Lighting setup
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            directionalLight.position.set(5, 5, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // Controls setup
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.enableZoom = true;
+            controls.enablePan = false;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 1.0;
+
+            // Load GLB model
+            const loader = new THREE.GLTFLoader();
+            loader.load('./Male.glb', 
+                function(gltf) {
+                    const model = gltf.scene;
+                    
+                    // Calculate bounding box to center and scale the model
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+                    
+                    // Center the model
+                    model.position.sub(center);
+                    
+                    // Scale the model to fit nicely in the container
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scale = 1.5 / maxDim;
+                    model.scale.setScalar(scale);
+                    
+                    // Enable shadows
+                    model.traverse(function(child) {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    
+                    scene.add(model);
+                    
+                    // Animation loop
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        controls.update();
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+                    
+                    console.log('3D model loaded successfully');
+                }, 
+                function(progress) {
+                    console.log('Loading progress:', (progress.loaded / progress.total * 100) + '%');
+                }, 
+                function(error) {
+                    console.error('Error loading model:', error);
+                    // Fallback: show a simple human-like geometry
+                    const group = new THREE.Group();
+                    
+                    // Head
+                    const headGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+                    const headMaterial = new THREE.MeshLambertMaterial({ color: 0xfdbcb4 });
+                    const head = new THREE.Mesh(headGeometry, headMaterial);
+                    head.position.set(0, 0.6, 0);
+                    group.add(head);
+                    
+                    // Body
+                    const bodyGeometry = new THREE.CylinderGeometry(0.2, 0.25, 0.6, 8);
+                    const bodyMaterial = new THREE.MeshLambertMaterial({ color: 0x87ceeb });
+                    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                    body.position.set(0, 0, 0);
+                    group.add(body);
+                    
+                    // Arms
+                    const armGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.5, 8);
+                    const armMaterial = new THREE.MeshLambertMaterial({ color: 0xfdbcb4 });
+                    
+                    const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+                    leftArm.position.set(-0.3, 0.1, 0);
+                    leftArm.rotation.z = Math.PI / 6;
+                    group.add(leftArm);
+                    
+                    const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+                    rightArm.position.set(0.3, 0.1, 0);
+                    rightArm.rotation.z = -Math.PI / 6;
+                    group.add(rightArm);
+                    
+                    // Legs
+                    const legGeometry = new THREE.CylinderGeometry(0.08, 0.08, 0.6, 8);
+                    const legMaterial = new THREE.MeshLambertMaterial({ color: 0x4169e1 });
+                    
+                    const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+                    leftLeg.position.set(-0.1, -0.6, 0);
+                    group.add(leftLeg);
+                    
+                    const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+                    rightLeg.position.set(0.1, -0.6, 0);
+                    group.add(rightLeg);
+                    
+                    scene.add(group);
+                    
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        group.rotation.y += 0.01;
+                        controls.update();
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+                    
+                    console.log('Fallback 3D figure created');
+                }
+            );
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+
+        // Initialize 3D model when page loads
+        window.addEventListener('load', init3DModel);
+    </script>
+</body>
+</html>
