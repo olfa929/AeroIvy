@@ -232,5 +232,15 @@ else:
         if st.button("Proceed"):
             
             st.success(f"Proceeding with {patient_name} ({patient_id}) in {dept}")
+            st.components.v1.html(
+                """
+                <script>
+                    // navigate away from Streamlit onto your local HTTP-served file
+                    window.location.replace("http://localhost:8502/docdash.html");
+                </script>
+                """,
+                height=0,
+            )
+
             
   
