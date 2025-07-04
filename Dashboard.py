@@ -57,7 +57,7 @@ if not st.session_state.auth:
             }
             /* Background image */
             .stApp {
-                background-image: url("https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-faa4-620a-bf31-931036a927f1/raw?se=2025-07-04T07%3A12%3A56Z&sp=r&sv=2024-08-04&sr=b&scid=8333fe00-3aa0-57e7-a985-a1aae0bbd65d&skoid=31bc9c1a-c7e0-460a-8671-bf4a3c419305&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-07-03T15%3A17%3A11Z&ske=2025-07-04T15%3A17%3A11Z&sks=b&skv=2024-08-04&sig=BlSgGGE1efJYsP%2BMGwqY8ojlZ3QQzZXd/O2G5xH0dQ8%3D");
+                background-image: url("https://i.pinimg.com/736x/4d/fe/60/4dfe60d6dcfc678ede3a02aba319e89c.jpg");
                 background-size: cover;
                 background-position: center;
             }
