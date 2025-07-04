@@ -232,15 +232,22 @@ else:
         if st.button("Proceed"):
             
             st.success(f"Proceeding with {patient_name} ({patient_id}) in {dept}")
-            components.html(
-                """
-                <script type="text/javascript">
-                // force the browser to navigate the top‐level window
-                top.location.href = "https://raw.githack.com/olfa929/AeroIvy/main/docdash.html";
-                </script>
-                """,
-                height=1,
-                width=1,
+            redirect_url = "https://raw.githack.com/olfa929/AeroIvy/main/docdash.html"
+
+            # Meta-refresh approach:
+            st.markdown(
+                f'''<head>
+                    <meta http-equiv="refresh" content="0;url={redirect_url}">
+                </head>''',
+                unsafe_allow_html=True,
             )
-                    
+
+            # Fallback JS in case meta-refresh is ignored:
+            st.markdown(
+                f'''<script type="text/javascript">
+                    window.location.replace("{redirect_url}");
+                </script>''',
+                unsafe_allow_html=True,
+            )
+                            
   
