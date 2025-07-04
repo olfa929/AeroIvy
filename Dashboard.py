@@ -30,7 +30,7 @@ if not st.session_state.auth:
 
     with col_form:
         st.markdown(
-            """
+            f"""
             <style>
             .stApp {
                 background-image: url("https://i.pinimg.com/736x/f7/10/3e/f7103e5b3a214fb77ad8b647003dfd4e.jpg");
@@ -59,7 +59,7 @@ if not st.session_state.auth:
             }
             /* Background image */
             .stApp {
-                background-image: url("data:image/jpeg;base64,{img_b64}");
+                background-image: url("data:image/png;base64,{img_b64}");
                 background-size: cover;
                 background-position: center;
             }
@@ -137,7 +137,7 @@ else:
         img_b64 = base64.b64encode(img.read()).decode()
        
     st.markdown(
-        """
+        f"""
         <style>
         
         /* Hide the top bar */
