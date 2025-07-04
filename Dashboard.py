@@ -57,7 +57,7 @@ if not st.session_state.auth:
             }
             /* Background image */
             .stApp {
-                background-image: url("https://drive.google.com/file/d/1hO5CYpNR_QYeDthGYdYByN0JS0tyUH-h");
+                background-image: url("https://drive.google.com/uc?export=view&id=1hO5CYpNR_QYeDthGYdYByN0JS0tyUH-h");
                 background-size: cover;
                 background-position: center;
             }
@@ -149,7 +149,7 @@ else:
 
         /* Full-screen background image */
         .stApp {
-          background: url("https://drive.google.com/file/d/1TEPHJsBJ-qDl9TGb8Engd8aeq8PUowTw")
+          background: url("https://drive.google.com/uc?export=view&id=1TEPHJsBJ-qDl9TGb8Engd8aeq8PUowTw")
                       center/cover no-repeat !important;
         }
 
