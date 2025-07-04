@@ -25,12 +25,10 @@ if not st.session_state.auth:
 
     with col_empty:
         st.write("")
-    with open(r"C:\Users\bouti\Downloads\ChatGPT Image Jul 4, 2025, 08_19_38 AM.png", "rb") as img:
-        img_b64 = base64.b64encode(img.read()).decode()
 
     with col_form:
         st.markdown(
-            f"""
+            """
             <style>
             .stApp {
                 background-image: url("https://i.pinimg.com/736x/f7/10/3e/f7103e5b3a214fb77ad8b647003dfd4e.jpg");
@@ -59,7 +57,7 @@ if not st.session_state.auth:
             }
             /* Background image */
             .stApp {
-                background-image: url("data:image/png;base64,{img_b64}");
+                background-image: url("https://drive.google.com/file/d/1hO5CYpNR_QYeDthGYdYByN0JS0tyUH-h");
                 background-size: cover;
                 background-position: center;
             }
@@ -133,11 +131,9 @@ if not st.session_state.auth:
 
         
 else:
-    with open(r"C:\Users\bouti\Downloads\ChatGPT Image Jul 3, 2025, 11_52_16 PM.png", "rb") as img:
-        img_b64 = base64.b64encode(img.read()).decode()
        
     st.markdown(
-        f"""
+        """
         <style>
         
         /* Hide the top bar */
@@ -153,7 +149,7 @@ else:
 
         /* Full-screen background image */
         .stApp {
-          background-image: url("data:image/png;base64,{img_b64}");
+          background: url("https://drive.google.com/file/d/1TEPHJsBJ-qDl9TGb8Engd8aeq8PUowTw")
                       center/cover no-repeat !important;
         }
 
