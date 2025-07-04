@@ -149,7 +149,7 @@ else:
 
         /* Full-screen background image */
         .stApp {
-          background: url("https://sdmntprnortheu.oaiusercontent.com/files/00000000-6164-61f4-ac2d-6ceb6f5699a8/raw?se=2025-07-03T23%3A55%3A30Z&sp=r&sv=2024-08-04&sr=b&scid=5b62c6cd-2f5f-5a80-b9db-b6ede8c15fda&skoid=eb780365-537d-4279-a878-cae64e33aa9c&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-07-03T06%3A43%3A22Z&ske=2025-07-04T06%3A43%3A22Z&sks=b&skv=2024-08-04&sig=R513T4SgaQZ/Ry%2BSP/24Nz5gWMQly0ho1o9LsZbmvQo%3D")
+          background: url("https://sdmntprnortheu.oaiusercontent.com/files/00000000-6164-61f4-ac2d-6ceb6f5699a8/raw?se=2025-07-04T07%3A13%3A28Z&sp=r&sv=2024-08-04&sr=b&scid=7f0a198b-56bb-5db2-a902-96405332eb6a&skoid=31bc9c1a-c7e0-460a-8671-bf4a3c419305&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-07-04T05%3A30%3A50Z&ske=2025-07-05T05%3A30%3A50Z&sks=b&skv=2024-08-04&sig=HlGe6CyjnuzVnBE/EIahNtdbkhS2Q0O/SZ/l0iiTpgk%3D")
                       center/cover no-repeat !important;
         }
 
