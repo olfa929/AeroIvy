@@ -21,6 +21,9 @@ def do_login():
 if "auth" not in st.session_state:
     st.session_state.auth = False
 if not st.session_state.auth:
+    with open(r"C:\Users\bouti\Downloads\ChatGPT Image Jul 4, 2025, 08_19_38 AM.png", "rb") as img:
+        img_b64 = base64.b64encode(img.read()).decode()
+
     col_empty, col_form = st.columns([2, 2])
 
     with col_empty:
@@ -30,14 +33,12 @@ if not st.session_state.auth:
         st.markdown(
             """
             <style>
-            .stApp {
-                background-image: url("https://i.pinimg.com/736x/f7/10/3e/f7103e5b3a214fb77ad8b647003dfd4e.jpg");
+            .stApp {{
+                background-image: url("data:image/png;base64,{img_b64}");
                 background-size: cover;
                 background-position: center;
-            }
-            [data-testid="stHeader"] {
-                visibility: hidden;
-            }
+            }}
+            [data-testid="stHeader"] {{ visibility: hidden; }}
             [data-testid="stHeader"] {
                 visibility: hidden;
             }
