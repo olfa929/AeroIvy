@@ -57,7 +57,7 @@ if not st.session_state.auth:
             }
             /* Background image */
             .stApp {
-                background-image: url("https://sdmntprnortheu.oaiusercontent.com/files/00000000-6164-61f4-ac2d-6ceb6f5699a8/raw?se=2025-07-04T01%3A02%3A08Z&sp=r&sv=2024-08-04&sr=b&scid=fa9146b7-142c-5539-83cc-d3e8137c3e3d&skoid=02b7f7b5-29f8-416a-aeb6-99464748559d&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-07-03T02%3A15%3A45Z&ske=2025-07-04T02%3A15%3A45Z&sks=b&skv=2024-08-04&sig=5ywX9i/7V31tdXQoKugwcz31gwjsjRj7SVnoAMnMxPk%3D");
+                background-image: url("https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-faa4-620a-bf31-931036a927f1/raw?se=2025-07-04T07%3A12%3A56Z&sp=r&sv=2024-08-04&sr=b&scid=8333fe00-3aa0-57e7-a985-a1aae0bbd65d&skoid=31bc9c1a-c7e0-460a-8671-bf4a3c419305&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-07-03T15%3A17%3A11Z&ske=2025-07-04T15%3A17%3A11Z&sks=b&skv=2024-08-04&sig=BlSgGGE1efJYsP%2BMGwqY8ojlZ3QQzZXd/O2G5xH0dQ8%3D");
                 background-size: cover;
                 background-position: center;
             }
