@@ -232,14 +232,5 @@ else:
         if st.button("Proceed"):
             
             st.success(f"Proceeding with {patient_name} ({patient_id}) in {dept}")
-            # --- embed your standalone HTML dashboard here: ---
-            with open("docdash.html", "r", encoding="utf-8") as f:
-                dash_html = f.read()
-        
-            st.components.v1.html(
-                dash_html,
-                height=800,        # adjust height as needed
-                scrolling=True
-            )
-
+            
   
