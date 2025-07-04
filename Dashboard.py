@@ -236,7 +236,7 @@ else:
                 """
                 <script>
                 // replace this URL with your raw.githack (or other) URL:
-                window.location.href = "https://raw.githack.com/your-username/AeroIvy/main/docdash.html";
+                window.location.href = "https://github.com/olfa929/AeroIvy/blob/main/docdash.html";
                 </script>
                 """,
                 height=0,  # so no extra space shows up
