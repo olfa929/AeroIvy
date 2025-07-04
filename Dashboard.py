@@ -21,9 +21,6 @@ def do_login():
 if "auth" not in st.session_state:
     st.session_state.auth = False
 if not st.session_state.auth:
-    with open(r"C:\Users\bouti\Downloads\ChatGPT Image Jul 4, 2025, 08_19_38 AM.png", "rb") as img:
-        img_b64 = base64.b64encode(img.read()).decode()
-
     col_empty, col_form = st.columns([2, 2])
 
     with col_empty:
@@ -33,12 +30,14 @@ if not st.session_state.auth:
         st.markdown(
             """
             <style>
-            .stApp {{
-                background-image: url("data:image/png;base64,{img_b64}");
+            .stApp {
+                background-image: url("https://i.pinimg.com/736x/f7/10/3e/f7103e5b3a214fb77ad8b647003dfd4e.jpg");
                 background-size: cover;
                 background-position: center;
-            }}
-            [data-testid="stHeader"] {{ visibility: hidden; }}
+            }
+            [data-testid="stHeader"] {
+                visibility: hidden;
+            }
             [data-testid="stHeader"] {
                 visibility: hidden;
             }
@@ -58,7 +57,7 @@ if not st.session_state.auth:
             }
             /* Background image */
             .stApp {
-                background-image: url("https://drive.google.com/uc?export=view&id=1hO5CYpNR_QYeDthGYdYByN0JS0tyUH-h");
+                background-image: url("https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-faa4-620a-bf31-931036a927f1/raw?se=2025-07-04T07%3A12%3A56Z&sp=r&sv=2024-08-04&sr=b&scid=8333fe00-3aa0-57e7-a985-a1aae0bbd65d&skoid=31bc9c1a-c7e0-460a-8671-bf4a3c419305&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-07-03T15%3A17%3A11Z&ske=2025-07-04T15%3A17%3A11Z&sks=b&skv=2024-08-04&sig=BlSgGGE1efJYsP%2BMGwqY8ojlZ3QQzZXd/O2G5xH0dQ8%3D");
                 background-size: cover;
                 background-position: center;
             }
@@ -150,7 +149,7 @@ else:
 
         /* Full-screen background image */
         .stApp {
-          background: url("https://drive.google.com/uc?export=view&id=1TEPHJsBJ-qDl9TGb8Engd8aeq8PUowTw")
+          background: url("https://sdmntprnortheu.oaiusercontent.com/files/00000000-6164-61f4-ac2d-6ceb6f5699a8/raw?se=2025-07-04T07%3A13%3A28Z&sp=r&sv=2024-08-04&sr=b&scid=7f0a198b-56bb-5db2-a902-96405332eb6a&skoid=31bc9c1a-c7e0-460a-8671-bf4a3c419305&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-07-04T05%3A30%3A50Z&ske=2025-07-05T05%3A30%3A50Z&sks=b&skv=2024-08-04&sig=HlGe6CyjnuzVnBE/EIahNtdbkhS2Q0O/SZ/l0iiTpgk%3D")
                       center/cover no-repeat !important;
         }
 
@@ -234,13 +233,13 @@ else:
             
             st.success(f"Proceeding with {patient_name} ({patient_id}) in {dept}")
             st.components.v1.html(
-                """
-                <script>
-                    // navigate away from Streamlit onto your local HTTP-served file
-                    window.location.replace("http://localhost:8502/docdash.html");
-                </script>
-                """,
-                height=0,
+            """
+            <script>
+                // navigate away from Streamlit onto your local HTTP-served file
+                window.location.replace("http://localhost:8502/docdash.html");
+            </script>
+            """,
+            height=0,
             )
 
             
