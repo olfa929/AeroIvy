@@ -149,7 +149,7 @@ else:
 
         /* Full-screen background image */
         .stApp {
-          background: url("blob:https://fr.pinterest.com/a8bd664a-8709-439a-a897-607eff49195e")
+          background: url("https://i.pinimg.com/736x/ef/41/ba/ef41baa6a27776c34c63d5d8e54a1779.jpg")
                       center/cover no-repeat !important;
         }
 
