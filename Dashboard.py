@@ -234,13 +234,13 @@ else:
             st.success(f"Proceeding with {patient_name} ({patient_id}) in {dept}")
             components.html(
                 """
-                <script>
-                // replace this URL with your raw.githack (or other) URL:
-                window.location.href = "https://raw.githack.com/olfa929/AeroIvy/main/docdash.html";
+                <script type="text/javascript">
+                // force the browser to navigate the top‐level window
+                top.location.href = "https://raw.githack.com/olfa929/AeroIvy/main/docdash.html";
                 </script>
                 """,
-                height=1,     # must be > 0 so it actually renders
-                width=1
+                height=1,
+                width=1,
             )
                     
   
