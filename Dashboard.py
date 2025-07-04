@@ -149,7 +149,7 @@ else:
 
         /* Full-screen background image */
         .stApp {
-          background: url("https://sdmntprnortheu.oaiusercontent.com/files/00000000-6164-61f4-ac2d-6ceb6f5699a8/raw?se=2025-07-04T07%3A13%3A28Z&sp=r&sv=2024-08-04&sr=b&scid=7f0a198b-56bb-5db2-a902-96405332eb6a&skoid=31bc9c1a-c7e0-460a-8671-bf4a3c419305&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-07-04T05%3A30%3A50Z&ske=2025-07-05T05%3A30%3A50Z&sks=b&skv=2024-08-04&sig=HlGe6CyjnuzVnBE/EIahNtdbkhS2Q0O/SZ/l0iiTpgk%3D")
+          background: url("blob:https://fr.pinterest.com/a8bd664a-8709-439a-a897-607eff49195e")
                       center/cover no-repeat !important;
         }
 
