@@ -232,15 +232,14 @@ else:
         if st.button("Proceed"):
             
             st.success(f"Proceeding with {patient_name} ({patient_id}) in {dept}")
-            st.components.v1.html(
-            """
-            <script>
-                // navigate away from Streamlit onto your local HTTP-served file
-                window.location.replace("http://localhost:8502/docdash.html");
-            </script>
-            """,
-            height=0,
+            components.html(
+                """
+                <script>
+                // replace this URL with your raw.githack (or other) URL:
+                window.location.href = "https://raw.githack.com/your-username/AeroIvy/main/docdash.html";
+                </script>
+                """,
+                height=0,  # so no extra space shows up
             )
-
-            
+                    
   
