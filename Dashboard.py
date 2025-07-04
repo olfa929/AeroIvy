@@ -239,7 +239,8 @@ else:
                 window.location.href = "https://raw.githack.com/olfa929/AeroIvy/main/docdash.html";
                 </script>
                 """,
-                height=0,  # so no extra space shows up
+                height=1,     # must be > 0 so it actually renders
+                width=1
             )
                     
   
